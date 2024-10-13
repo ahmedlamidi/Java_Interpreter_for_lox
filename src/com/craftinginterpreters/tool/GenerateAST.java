@@ -30,17 +30,33 @@ public class GenerateAST {
         writer.println("import java.util.List;");
         writer.println();
         writer.println("abstract class " + baseName + " {");
+        defineVistitor(writer, baseName, types);
         for (String type: types){
             String className = type.split(":")[0].trim();
             String fields = type.split(":")[1].trim();
             defineType(writer, baseName, className, fields);
 
         }
+        writer.println();
+        writer.println("  abstract <R> R accept(Visitor<R> visitor);");
+        // this method will be overwritten by each subclass to return the right value when a function is called
         writer.println("}");
         writer.close();
 
     }
+    private static void defineVistitor(
+            PrintWriter writer, String baseName, List<String> types
+    ){
+        writer.println("  interface Visitor<R> {");
+        for (String type: types){
+            String typeName = type.split(":")[0].trim();
+            writer.println("    R visit" + typeName + baseName + "(" +
+                    typeName + " " + baseName.toLowerCase() + ")");
+        }
 
+        writer.println("    }");
+        // iterate through all the classes and create a visitor for each one
+    }
     private static void defineType(
             PrintWriter writer,  String baseName,
             String className, String fieldList){
@@ -57,7 +73,10 @@ public class GenerateAST {
 
         writer.println("    }");
         writer.println();
-        
+        writer.println("    @override");
+        writer.println("   <R> R accept(Visitor<R> visitor {");
+        writer.println("    return visitor.visit" + className + baseName + "(this);");
+
 
         for (String field : fields){
             writer.println("    final "  + field  + ";");
