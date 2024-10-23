@@ -45,6 +45,17 @@ public class Lox{
         }
     }
 
+    static void error (Token token, String message){
+        if(token.type == TokenType.EOF){
+            report(token.line, "at the end", message);
+            // reports the correct error if it is at the end of the line
+        }
+        else{
+            report(token.line, "at'" + token.Lexeme + "'"  , message);
+            // if it is in the middle of the line
+        }
+    }
+
     private static int run(String source, int comment_depth){
         Scanner scanner = new com.craftinginterpreters.lox.Scanner(source, comment_depth);
         List<Token> tokens = scanner.scanTokens();

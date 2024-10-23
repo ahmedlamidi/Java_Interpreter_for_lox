@@ -88,6 +88,18 @@ class Parser {
         }
         return null;
     }
+    private Token consume(TokenType type, String message){
+        if(check(type)) return advance(); // if we get the right token return it
+
+        throw error(peek(), message); // else we return an error token
+    }
+
+    private ParseError error(Token token, String message){
+        Lox.error(token, message);
+        return new ParseError();
+    }
+
+    private static class ParseError extends RuntimeException{} // we make a class of type runtime exception
 
     private boolean match(TokenType... types){
         // function to match the current token to any in the list of types
@@ -108,7 +120,7 @@ class Parser {
 
     private Token advance(){
         if(!isAtEnd()) current ++;
-        return previous();
+        return previous(); // returns the current token and moves to next token
     }
 
     private boolean isAtEnd(){
